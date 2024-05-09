@@ -10,6 +10,13 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
+    permissions:
+      security-events: write # Used to upload Sarif artifact to GitHub
+      contents: read # Used to check out a private repository
+      actions: read # Required for private repositories to upload Sarif files. GitHub Advanced Security licenses are required.
+      id-token: write # Used for keyless authentication with Endor Labs
+      issues: write # Required to automatically comment on PRs for new policy violations
+      pull-requests: write # Required to automatically comment on PRs for new policy violations
 
     steps:
     - uses: actions/checkout@v3
@@ -27,3 +34,18 @@ jobs:
       
     - name: Test
       run: dotnet test --no-restore --verbosity normal
+
+    - name: 'Endor Labs Scan Push to main'
+      uses: endorlabs/github-action@v1.1.2
+      with:
+        namespace: 'rob-test' # Replace with your Endor Labs tenant namespace
+        scan_dependencies: true
+        scan_secrets: true
+        pr: false
+        scan_summary_output_type: 'table'
+        sarif_file: 'findings.sarif'
+        
+    - name: Upload findings to github
+      uses: github/codeql-action/upload-sarif@9885f86fab4879632b7e44514f19148225dfbdcd
+      with:
+        sarif_file: 'findings.sarif'
