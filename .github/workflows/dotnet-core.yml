@@ -27,3 +27,21 @@ jobs:
       
     - name: Test
       run: dotnet test --no-restore --verbosity normal
+
+    - name: 'Endor Labs Scan Push to main'
+      uses: endorlabs/github-action@v1.1.2
+      with:
+        namespace: 'rob-test' # Replace with your Endor Labs tenant namespace
+        scan_dependencies: true
+        scan_secrets: true
+        pr: false
+        scan_summary_output_type: 'table'
+        sarif_file: 'findings.sarif'
+        enable_github_action_token: false
+        api_key: ${{ secrets.ENDOR_API_CREDENTIALS_KEY }}
+        api_secret: ${{ secrets.ENDOR_API_CREDENTIALS_SECRET }}
+        
+    - name: Upload findings to github
+      uses: github/codeql-action/upload-sarif@9885f86fab4879632b7e44514f19148225dfbdcd
+      with:
+        sarif_file: 'findings.sarif'
