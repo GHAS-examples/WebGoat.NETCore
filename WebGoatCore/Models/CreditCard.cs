@@ -227,6 +227,10 @@ namespace WebGoatCore.Models
                 xElement.Element("Number").Value = Number;
                 WriteCreditCardFile(document);
             }
+            catch (NullReferenceException as Exception)
+            {
+                // nom nom
+            }
             catch (NullReferenceException)   //The row was not found.
             {
                 throw new NullReferenceException(string.Format("Credit card for {0} was not found.", Username));
